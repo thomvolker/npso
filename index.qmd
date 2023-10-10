@@ -1,9 +1,492 @@
 ---
-title: "Het evalueren van de kwaliteit van synthetische data: Een density ratio aanpak"
+title: "Het evalueren van de kwaliteit van synthetische data"
+subtitle: "Een density ratio aanpak"
 author: "Thom Benjamin Volker"
-format: revealjs
+format: 
+  revealjs:
+    slide-number: true
+    df-print: kable
 ---
 
+## Intro
+
+<br>
+
+Thom Volker ([t.b.volker@uu.nl](mailto:t.b.volker@uu.nl))
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](files/me_square.jpg)
+:::
+
+::: {.column width="60%"}
+- MSc. in Methoden en Statistiek & Sociologie
+
+- PhD kandidaat bij Universiteit Utrecht en CBS
+
+  - Doel: Doorontwikkelen van veilige (!) data synthesis technieken
+
+:::
+
+::::
 
 
+## Vandaag
+
+Waarom is synthetische data nuttig?
+
+<br>
+
+Wat is synthetische data eigenlijk?
+
+<br>
+
+Hoe kunnen we de kwaliteit van synthetische in kaart brengen?
+
+::: aside
+
+Deze presentatie is mede tot stand gekomen dankzij bijdragen van Gerko Vink, Stef van Buuren, Erik-Jan van Kesteren en Peter-Paul de Wolf.
+
+:::
+
+# Open materialen
+
+Deze presentatie staat online op
+
+[https://thomvolker.github.io/npso](https://thomvolker.github.io/npso)
+
+De broncode en resultaten zijn te vinden op
+
+[https://github.com/thomvolker/npso](https://github.com/thomvolker/npso)
+
+# Stel je voor...
+
+##
+
+![Getty Images](files/segregation.jpg)
+
+## {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](files/people_blue.png)
+:::
+
+::: {.column width="50%"}
+
+![](files/table_blue.png)
+
+:::
+
+::::
+
+- Demografische informatie: leeftijd, geslacht, inkomen, etniciteit
+- Waar woon je? Hoe lang woon je op deze locatie?
+- Welke mensen zijn belangrijk in je leven (+ beschrijving)?
+
+## 
+
+<br>
+<br>
+
+:::: {.columns}
+
+::: {.column width="33%"}
+![](files/analysis_blue.png)
+:::
+
+::: {.column width="33%"}
+![](files/paper_blue.png)
+:::
+
+::: {.column width="33%"}
+![](files/open_materials.png)
+:::
+
+::::
+
+
+## Wat kan een andere onderzoeker allemaal nog met deze data doen?
+
+- Nieuwe onderzoeksvragen beantwoorden
+
+- Repliceren
+
+- Leren van data analyse
+
+- Testen van nieuwe analysemodellen
+
+- Gebruiken in onderwijs
+
+#
+
+```{r}
+#| echo: true
+#| eval: false
+
+data <- read.csv("geheime_data_set.csv")
+```
+
+# Open data? Liever niet...
+
+Maar misschien synthetische data?
+
+# Synthetische data
+
+_Neppe data, gegenereerde data, gesimuleerde data, digital twins_
+
+## Synthetische data
+
+<br>
+
+::: {.callout-tip title="Definitie"}
+
+Synthetische data is gegenereerd door een model.
+
+In tegenstelling tot echte, verzamelde, data, die voortkomt uit complexe systemen.
+
+:::
+
+<br>
+
+::: aside
+
+Mocht je dit complexe systeem nou volledig doorgrond hebben, kan je direct nieuwe data genereren uit het _ware_ proces. Hier kan geen synthetische data tegenop. Helaas komt het ook nooit voor.
+
+:::
+
+# Het recept voor synthetische data
+
+## Ingrediënten
+
+- Eén data set om te synthetiseren
+
+- Eén generatief model
+
+::: aside
+
+Dat is alles.
+
+:::
+
+## Generative model
+
+$$p(\boldsymbol{X} | \theta)$$
+
+- Een model $f$ voor de data $\boldsymbol{X}$;
+
+- Met parameters $\theta$;
+
+- Geschat op basis van de echte data.
+
+::: {.callout-tip title="Definitie"}
+
+Generatieve modellen leren de verdeling van de data $\boldsymbol{X}$ gegeven de parameters $\theta$.
+
+::: 
+
+## Voorbeelden van generatieve modellen
+
+Een normaalverdeling met parameters $\theta = \{\mu, \sigma\}$.
+
+Een histogram met klassen en proporties.
+
+Sequentiële regressiemodellen voor een multivariate verdeling (met regressiecoefficienten en (co-)variantieparameters).
+
+Een neuraal netwerk met duizenden parameters
+
+## [Generatieve modellen I: Neerslag in Nederland]{.r-fit-text}
+
+Neerslag (in mm per jaar): $\{\mu = 783, \sigma = 120\}$.
+
+```{r}
+library(ggplot2)
+readxl::read_xlsx("files/neerslag_nederland.xlsx", 
+                  range = "Hoeveelheid neerslag!A7:B116",
+                  col_names = c("Jaar", "Neerslag")) |>
+  ggplot(aes(x = Neerslag)) +
+  #geom_density(aes(fill = "Neerslag"), alpha = 0.3) +
+  geom_histogram(aes(y = ..density..), fill = "lightblue", col = "lightgrey", bins = 10) +
+  stat_function(fun = dnorm, args = list(mean = 783, sd = 120)) +
+  ylab(NULL) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Blues")
+```
+
+## [Generatieve modellen II: Sequentiële regressies]{.r-fit-text}
+
+MICE: Multiple Imputation by __Chained Equations__
+
+We kunnen een multivariaat generatief model creëren door univariate predictiemodellen te combineren.
+
+$$p(X_1, X_2, X_3) = p(X_1 | X_2, X_3) p(X_2 | X_1, X_3) p(X_3 | X_1, X_2)$$
+
+Handig: hiervoor kunnen univariate predictiemodellen gebruikt worden (lineaire regressie, tree-based methodes)!
+
+Predictiemodellen kunnen verschillen per variabele.
+
+## In de praktijk
+
+1. Schat $p(X_1 | X_2, X_3)$, 
+
+2. Genereer synthetische data $X_1^{*}$ gegeven geobserveerde waardes $X_2$ en $X_3$,
+
+3. Schat $p(X_2 | X_1, X_3)$,
+
+4. Genereer synthetische data $X_2^{*}$ gegeven synthetische waardes $X_1^{*}$ en geobserveerde waardes $X_3$,
+
+5. Schat $p(X_3 | X_1, X_2)$,
+
+6. Genereer synthetische data $X_3{*}$ gegeven synthetische waardes $X_1^{*}$ en $X_2^{*}$.
+
+# Synthetische data genereren is makkelijk
+
+Maar goede synthetische data genereren is moeilijk!
+
+## Synthetische data _bereiden_
+
+1. Basisbereiding: Creëer synthetische data met simpele modellen
+
+2. _Proef_ of de synthetische data voldoende kwaliteit heeft
+
+3. _Voeg complexiteit toe_ (transformaties, interacties, non-linearities)
+
+4. Itereer tussen (2.) en (3.) totdat de synthetische data de gewenste smaak heeft
+
+::: aside
+
+NOOT: Dit proces richt zich voornamelijk op de bruikbaarheid van synthetische data, en gaat voorbij aan mogelijke privacy-risico's. Hoe complexer het generatieve model, hoe groter de privacy risico's. Deze risico's moeten ook geanalyseerd worden!
+
+:::
+
+# De kwaliteit van synthetische data beoordelen
+
+##
+
+### Intuïtief
+
+- Hebben de synthetische en geobserveerde data een vergelijkbare verdeling?
+
+- Kunnen we de synthetische data voor dezelfde doeleinden gebruiken als de geobserveerde data?
+
+### Praktisch
+
+- Kunnen we de synthetische data onderscheiden van de echte data?
+
+- Geven analyses van de synthetische en geobserveerde data vergelijkbare resultaten?
+
+# De kwaliteit van synthetische data hangt af van waarvoor het gebruikt wordt
+
+Maar we weten vaak niet waarvoor deze gebruikt wordt...
+
+## Bestaande kwaliteitsmaten: $pMSE$
+
+1. Plak synthetische en geobserveerde data onder elkaar
+
+2. Voorspel voor elke observatie de kans $\pi_i$ dat deze synthetisch is
+
+3. Calculate $pMSE$ as $\sum^N_{i=1} (\pi_i - c)^2/N$, met $c = n_{\text{syn}} / (n_{\text{syn}} + n_{\text{obs}})$
+
+4. Vergelijk $pMSE$ met verwachte waarde onder identieke distributies
+
+Kleine $pMSE$ waardes: synthetische data lijkt op echte data.
+
+Nadeel: Welk voorspelmodel? Hoog-dimensionele data?
+
+## Bestaande kwaliteitsmaten: Kullback-Leibler divergence
+
+<br>
+
+$$KL(\boldsymbol{X}_{\text{syn}}, \boldsymbol{X}_{\text{obs}}) = \int \log\Bigg(\frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})}\Bigg) p(\boldsymbol{X}_\text{syn})$$
+
+<br>
+
+Elegante methode
+
+Praktisch moeilijk te schatten
+
+## 
+
+Als de synthetische en de geobserveerde data gelijke verdelingen hebben, zouden ze vergelijkbare resultaten moeten geven
+
+```{r}
+ggplot() +
+  stat_function(fun = dnorm, args = list(mean = 1, sd = 1),
+                col = "lightblue", linewidth = 1, linetype = 1) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = sqrt(2)),
+                col = "navy", linewidth = 1, linetype = 4) +
+  theme_void() +
+  xlim(-5, 5) +
+  ylim(0, 0.5) +
+  ylab(NULL)
+```
+
+# Een nieuw raamwerk
+
+Density ratios^[Zie _Masashi, Suzuki & Kanamori (2012). Density ratio estimation in machine learning._] als kwaliteitsmaat
+
+<br>
+
+$$r(x) = \frac{p(\boldsymbol{X}_{\text{syn }})}{p(\boldsymbol{X}_{obs})}$$
+<br>
+<br>
+
+## Density ratios
+
+```{r}
+library(patchwork)
+dlaplace <- function(x, mu = 0, sd = 1) exp(-abs(x-mu)/(sd / sqrt(2))) / (2*(sd / sqrt(2)))
+dratio_lap_norm <- function(x, mu = 0, sd = 1) {
+  dnorm(x, mu, sd) / dlaplace(x, mu, sd)
+}
+
+ggplot() +
+  stat_function(fun = dlaplace, args = list(mu = 0, sd = 1),
+                col = "lightblue", linewidth = 1, linetype = 1) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                col = "navy", linewidth = 1, linetype = 4) +
+  xlim(-5, 5) +
+  ylim(0, 0.8) +
+  theme_classic() +
+  ylab(NULL) +
+ggplot() +
+  stat_function(fun = dratio_lap_norm, args = list(mu = 0, sd = 1),
+                linewidth = 1, linetype = 1) +
+  xlim(-5, 5) +
+  ylim(0, 2) +
+  theme_classic() +
+  ylab(NULL) +
+ggplot() +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                col = "lightblue", linewidth = 1, linetype = 1) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                col = "navy", linewidth = 1, linetype = 4) +
+  xlim(-5, 5) +
+  ylim(0, 0.8) +
+  theme_classic() +
+  ylab(NULL) +
+ggplot() +
+  geom_abline(intercept = 1, slope = 0, linewidth = 1, linetype = 1) +
+  theme_classic() +
+  xlim(-5, 5) +
+  ylim(0, 2) +
+  ylab(NULL)
+```
+
+## Density ratios in de praktijk {.smaller}
+
+1. Schat de density ratio met een non-parametrische methode
+
+- Unconstrained least-squares importance fitting: $r(\boldsymbol{X}) = \boldsymbol{\psi(X)}\theta$.
+
+2. Bereken een discrepantie maat voor de synthetische data
+
+- Pearson divergence: $$\hat{\text{PE}}(\boldsymbol{X}_{\text{syn}}, \boldsymbol{X}_{\text{obs}}) = \frac{1}{2n_{\text{syn}}} \sum^{n_{\text{syn}}}_{i=1} r(X^{(i)}_{\text{syn}}) - \frac{1}{n_{\text{obs}}} \sum^{n_{\text{obs}}}_{j=1} r(X^{(j)}_{\text{obs}}) + \frac{1}{2}$$
+
+3. Vergelijk de Pearson divergence voor verschillende data sets
+
+4. Optioneel: Toets de nulhypothese $p(\boldsymbol{X}_{\text{syn}}) = p(\boldsymbol{X}_{\text{obs}})$ d.m.v. een permutatietest.
+
+## Density ratios voor synthetische data (univariaat)
+
+![](files/densities.png)
+
+## Density ratios voor synthetische data (univariaat)
+
+![](files/density-ratios.png)
+
+## Density ratios voor synthetische data (univariaat)
+
+Power en type I error rate
+
+```{r}
+tibble::tibble(Data = c("Laplace", "Log-normal", "lst", "Normal"),
+               `Density ratio` = c(0.620, 1.000, 0.495, 0.050),
+               `Kolmogorov-Smirnov` = c(0.375, 1.000, 0.235, 0.045),
+               `pMSE` = c(0.610, 1.000, 0.495, 0.040))
+```
+
+## Density ratios voor synthetische data (multivariaat) {.smaller}
+
+### U.S. Current Population Survey (n = 5000)^[Dank aan Jörg Drechsler voor het beschikbaar stellen van de data.]
+
+- Vier continue variabelen (_age, income, social security payments, household income_)
+- Vier categorische variabelen (_sex, race, marital status, educational attainment_)
+
+### Synthesische modellen
+
+(Multinomiale) logistische regressie voor categorische variabelen
+
+1. Lineaire regressie
+2. Lineaire regressie met transformaties (derdemachtswortel)
+3. Lineaire regressie met transformaties en semi-continu modelleren
+
+## Synthetische data (visueel)
+
+![](files/syn-vars.png)
+
+## Kwaliteit van synthetische data
+
+![](files/syn-PEs.png)
+
+## Nadelen van density ratios
+
+Geschiktheid voor categorische data moet onderzocht worden
+
+- In bovenstaand voorbeeld werd categorische data simpelweg getransformeerd naar numerieke data (vier categoriën --> 1, 2, 3, 4)
+
+Privacy risico's van density ratio waardes?
+
+# Bijkomende voordelen van density ratios
+
+## Kwaliteit van synthetische data punten
+
+Voor iedere synthetische observatie wordt een density ratio waarde geschat
+
+- Synthetische outliers detecteren / verwijderen
+
+- Analyses op synthetische data herwegen
+
+
+## Beschikbare extensies voor hoogdimensionele data
+
+Aanname: subspace waarin de synthetische data goed gemodelleerd is, en een subspace waar de synthetische data niet goed gemodelleerd is
+
+Doel: subspace herkennen waar de synthetische data niet goed gemodelleerd is, en hierop de density ratio schatten.
+
+## Kruisvalidatie voor automatische parameter selectie
+
+In alle bovengenoemde voorbeelden zijn dezelfde hyperparameters gebruikt
+
+Kruisvalidatie zorgt ervoor dat de parameters in het density ratio model zo goed mogelijk gekozen worden.
+
+
+
+# Bestaande kwaliteitsmaten als density ratios
+
+## $pMSE$ {.smaller}
+
+$$\begin{aligned}
+r(\boldsymbol{X}) &= \frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})} \\
+&= \frac{p(\boldsymbol{X} | Y = \text{synthetic})}{p(\boldsymbol{X}| Y = \text{observed})} 
+= \frac{\frac{p(Y = \text{synthetic} | \boldsymbol{X})p(\boldsymbol{X})}{p(Y = \text{synthetic})}}{\frac{p(Y = \text{observed})p(\boldsymbol{X})}{p(Y = \text{observed})}} \\
+&= \frac{p(Y = \text{observed})}{p(Y = \text{synthetic})} \frac{p(Y = \text{synthetic} | \boldsymbol{X})}{p(Y = \text{observed} | \boldsymbol{X})}
+\end{aligned}$$
+
+## Kullback-Leibler divergence {.smaller}
+
+$$\begin{aligned}
+KL(\boldsymbol{X}_{\text{syn}}, X_{\text{obs}}) = \int \log\Bigg(\frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})}\Bigg) p(\boldsymbol{X}_\text{syn})
+\end{aligned}$$
+
+Note that 
+$$
+\int \log\Bigg(\frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})}\Bigg) p(\boldsymbol{X}_\text{syn})
+$$
+can be approximated as
+$$
+\sum^{n_{\text{syn}}}_{i=1} \log(r(\boldsymbol{X}_\text{syn}))/n_{\text{syn}}.
+$$
 

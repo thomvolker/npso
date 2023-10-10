@@ -11,7 +11,7 @@
   <meta name="generator" content="quarto-1.3.340">
 
   <meta name="author" content="Thom Benjamin Volker">
-  <title>Het evalueren van de kwaliteit van synthetische data: Een density ratio aanpak</title>
+  <title>Het evalueren van de kwaliteit van synthetische data</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -29,6 +29,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="index_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link href="index_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -325,7 +390,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Het evalueren van de kwaliteit van synthetische data: Een density ratio aanpak</h1>
+  <h1 class="title">Het evalueren van de kwaliteit van synthetische data</h1>
+  <p class="subtitle">Een density ratio aanpak</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -336,30 +402,428 @@ Thom Benjamin Volker
 </div>
 
 </section>
-<section id="quarto" class="slide level2">
-<h2>Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <a href="https://quarto.org/docs/presentations/" class="uri">https://quarto.org/docs/presentations/</a>.</p>
-</section>
-<section id="bullets" class="slide level2">
-<h2>Bullets</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes:</p>
+<section id="intro" class="slide level2">
+<h2>Intro</h2>
+<p><br></p>
+<p>Thom Volker (<a href="mailto:t.b.volker@uu.nl">t.b.volker@uu.nl</a>)</p>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p><img data-src="files/me_square.jpg"></p>
+</div><div class="column" style="width:60%;">
 <ul>
-<li>Content authored with markdown</li>
-<li>Output from executable code</li>
+<li><p>MSc. in Methoden en Statistiek &amp; Sociologie</p></li>
+<li><p>PhD kandidaat bij Universiteit Utrecht en CBS</p>
+<ul>
+<li>Doel: Doorontwikkelen van veilige (!) data synthesis technieken</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="vandaag" class="slide level2">
+<h2>Vandaag</h2>
+<p>Waarom is synthetische data nuttig?</p>
+<p><br></p>
+<p>Wat is synthetische data eigenlijk?</p>
+<p><br></p>
+<p>Hoe kunnen we de kwaliteit van synthetische in kaart brengen?</p>
+
+<aside><div>
+<p>Deze presentatie is mede tot stand gekomen dankzij bijdragen van Gerko Vink, Stef van Buuren, Erik-Jan van Kesteren en Peter-Paul de Wolf.</p>
+</div></aside></section>
+<section id="open-materialen" class="title-slide slide level1 center">
+<h1>Open materialen</h1>
+<p>Deze presentatie staat online op</p>
+<p><a href="https://thomvolker.github.io/npso">https://thomvolker.github.io/npso</a></p>
+<p>De broncode en resultaten zijn te vinden op</p>
+<p><a href="https://github.com/thomvolker/npso">https://github.com/thomvolker/npso</a></p>
+</section>
+
+<section>
+<section id="stel-je-voor" class="title-slide slide level1 center">
+<h1>Stel je voor…</h1>
+
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+
+<img data-src="files/segregation.jpg" class="r-stretch quarto-figure-center"><p class="caption">Getty Images</p></section>
+<section id="section-1" class="slide level2 smaller">
+<h2></h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="files/people_blue.png"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="files/table_blue.png"></p>
+</div>
+</div>
+<ul>
+<li>Demografische informatie: leeftijd, geslacht, inkomen, etniciteit</li>
+<li>Waar woon je? Hoe lang woon je op deze locatie?</li>
+<li>Welke mensen zijn belangrijk in je leven (+ beschrijving)?</li>
 </ul>
 </section>
-<section id="code" class="slide level2">
-<h2>Code</h2>
-<p>When you click the <strong>Render</strong> button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
+<section id="section-2" class="slide level2">
+<h2></h2>
+<p><br> <br></p>
+<div class="columns">
+<div class="column" style="width:33%;">
+<p><img data-src="files/analysis_blue.png"></p>
+</div><div class="column" style="width:33%;">
+<p><img data-src="files/paper_blue.png"></p>
+</div><div class="column" style="width:33%;">
+<p><img data-src="files/open_materials.png"></p>
+</div>
+</div>
+</section>
+<section id="wat-kan-een-andere-onderzoeker-allemaal-nog-met-deze-data-doen" class="slide level2">
+<h2>Wat kan een andere onderzoeker allemaal nog met deze data doen?</h2>
+<ul>
+<li><p>Nieuwe onderzoeksvragen beantwoorden</p></li>
+<li><p>Repliceren</p></li>
+<li><p>Leren van data analyse</p></li>
+<li><p>Testen van nieuwe analysemodellen</p></li>
+<li><p>Gebruiken in onderwijs</p></li>
+</ul>
+</section></section>
+<section id="section-3" class="title-slide slide level1 center">
+<h1></h1>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"geheime_data_set.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+<section id="open-data-liever-niet" class="title-slide slide level1 center">
+<h1>Open data? Liever niet…</h1>
+<p>Maar misschien synthetische data?</p>
+</section>
+
+<section>
+<section id="synthetische-data" class="title-slide slide level1 center">
+<h1>Synthetische data</h1>
+<p><em>Neppe data, gegenereerde data, gesimuleerde data, digital twins</em></p>
+</section>
+<section id="synthetische-data-1" class="slide level2">
+<h2>Synthetische data</h2>
+<p><br></p>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Definitie</strong></p>
+</div>
+<div class="callout-content">
+<p>Synthetische data is gegenereerd door een model.</p>
+<p>In tegenstelling tot echte, verzamelde, data, die voortkomt uit complexe systemen.</p>
 </div>
 </div>
+</div>
+<p><br></p>
+
+<aside><div>
+<p>Mocht je dit complexe systeem nou volledig doorgrond hebben, kan je direct nieuwe data genereren uit het <em>ware</em> proces. Hier kan geen synthetische data tegenop. Helaas komt het ook nooit voor.</p>
+</div></aside></section></section>
+<section>
+<section id="het-recept-voor-synthetische-data" class="title-slide slide level1 center">
+<h1>Het recept voor synthetische data</h1>
+
+</section>
+<section id="ingrediënten" class="slide level2">
+<h2>Ingrediënten</h2>
+<ul>
+<li><p>Eén data set om te synthetiseren</p></li>
+<li><p>Eén generatief model</p></li>
+</ul>
+
+<aside><div>
+<p>Dat is alles.</p>
+</div></aside></section>
+<section id="generative-model" class="slide level2">
+<h2>Generative model</h2>
+<p><span class="math display">\[p(\boldsymbol{X} | \theta)\]</span></p>
+<ul>
+<li><p>Een model <span class="math inline">\(f\)</span> voor de data <span class="math inline">\(\boldsymbol{X}\)</span>;</p></li>
+<li><p>Met parameters <span class="math inline">\(\theta\)</span>;</p></li>
+<li><p>Geschat op basis van de echte data.</p></li>
+</ul>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Definitie</strong></p>
+</div>
+<div class="callout-content">
+<p>Generatieve modellen leren de verdeling van de data <span class="math inline">\(\boldsymbol{X}\)</span> gegeven de parameters <span class="math inline">\(\theta\)</span>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="voorbeelden-van-generatieve-modellen" class="slide level2">
+<h2>Voorbeelden van generatieve modellen</h2>
+<p>Een normaalverdeling met parameters <span class="math inline">\(\theta = \{\mu, \sigma\}\)</span>.</p>
+<p>Een histogram met klassen en proporties.</p>
+<p>Sequentiële regressiemodellen voor een multivariate verdeling (met regressiecoefficienten en (co-)variantieparameters).</p>
+<p>Een neuraal netwerk met duizenden parameters</p>
+</section>
+<section id="generatieve-modellen-i-neerslag-in-nederland" class="slide level2">
+<h2><span class="r-fit-text">Generatieve modellen I: Neerslag in Nederland</span></h2>
+<p>Neerslag (in mm per jaar): <span class="math inline">\(\{\mu = 783, \sigma = 120\}\)</span>.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+<section id="generatieve-modellen-ii-sequentiële-regressies" class="slide level2">
+<h2><span class="r-fit-text">Generatieve modellen II: Sequentiële regressies</span></h2>
+<p>MICE: Multiple Imputation by <strong>Chained Equations</strong></p>
+<p>We kunnen een multivariaat generatief model creëren door univariate predictiemodellen te combineren.</p>
+<p><span class="math display">\[p(X_1, X_2, X_3) = p(X_1 | X_2, X_3) p(X_2 | X_1, X_3) p(X_3 | X_1, X_2)\]</span></p>
+<p>Handig: hiervoor kunnen univariate predictiemodellen gebruikt worden (lineaire regressie, tree-based methodes)!</p>
+<p>Predictiemodellen kunnen verschillen per variabele.</p>
+</section>
+<section id="in-de-praktijk" class="slide level2">
+<h2>In de praktijk</h2>
+<ol type="1">
+<li><p>Schat <span class="math inline">\(p(X_1 | X_2, X_3)\)</span>,</p></li>
+<li><p>Genereer synthetische data <span class="math inline">\(X_1^{*}\)</span> gegeven geobserveerde waardes <span class="math inline">\(X_2\)</span> en <span class="math inline">\(X_3\)</span>,</p></li>
+<li><p>Schat <span class="math inline">\(p(X_2 | X_1, X_3)\)</span>,</p></li>
+<li><p>Genereer synthetische data <span class="math inline">\(X_2^{*}\)</span> gegeven synthetische waardes <span class="math inline">\(X_1^{*}\)</span> en geobserveerde waardes <span class="math inline">\(X_3\)</span>,</p></li>
+<li><p>Schat <span class="math inline">\(p(X_3 | X_1, X_2)\)</span>,</p></li>
+<li><p>Genereer synthetische data <span class="math inline">\(X_3{*}\)</span> gegeven synthetische waardes <span class="math inline">\(X_1^{*}\)</span> en <span class="math inline">\(X_2^{*}\)</span>.</p></li>
+</ol>
+</section></section>
+<section>
+<section id="synthetische-data-genereren-is-makkelijk" class="title-slide slide level1 center">
+<h1>Synthetische data genereren is makkelijk</h1>
+<p>Maar goede synthetische data genereren is moeilijk!</p>
+</section>
+<section id="synthetische-data-bereiden" class="slide level2">
+<h2>Synthetische data <em>bereiden</em></h2>
+<ol type="1">
+<li><p>Basisbereiding: Creëer synthetische data met simpele modellen</p></li>
+<li><p><em>Proef</em> of de synthetische data voldoende kwaliteit heeft</p></li>
+<li><p><em>Voeg complexiteit toe</em> (transformaties, interacties, non-linearities)</p></li>
+<li><p>Itereer tussen (2.) en (3.) totdat de synthetische data de gewenste smaak heeft</p></li>
+</ol>
+
+<aside><div>
+<p>NOOT: Dit proces richt zich voornamelijk op de bruikbaarheid van synthetische data, en gaat voorbij aan mogelijke privacy-risico’s. Hoe complexer het generatieve model, hoe groter de privacy risico’s. Deze risico’s moeten ook geanalyseerd worden!</p>
+</div></aside></section></section>
+<section>
+<section id="de-kwaliteit-van-synthetische-data-beoordelen" class="title-slide slide level1 center">
+<h1>De kwaliteit van synthetische data beoordelen</h1>
+
+</section>
+<section id="section-4" class="slide level2">
+<h2></h2>
+<h3 id="intuïtief">Intuïtief</h3>
+<ul>
+<li><p>Hebben de synthetische en geobserveerde data een vergelijkbare verdeling?</p></li>
+<li><p>Kunnen we de synthetische data voor dezelfde doeleinden gebruiken als de geobserveerde data?</p></li>
+</ul>
+<h3 id="praktisch">Praktisch</h3>
+<ul>
+<li><p>Kunnen we de synthetische data onderscheiden van de echte data?</p></li>
+<li><p>Geven analyses van de synthetische en geobserveerde data vergelijkbare resultaten?</p></li>
+</ul>
+</section></section>
+<section>
+<section id="de-kwaliteit-van-synthetische-data-hangt-af-van-waarvoor-het-gebruikt-wordt" class="title-slide slide level1 center">
+<h1>De kwaliteit van synthetische data hangt af van waarvoor het gebruikt wordt</h1>
+<p>Maar we weten vaak niet waarvoor deze gebruikt wordt…</p>
+</section>
+<section id="bestaande-kwaliteitsmaten-pmse" class="slide level2">
+<h2>Bestaande kwaliteitsmaten: <span class="math inline">\(pMSE\)</span></h2>
+<ol type="1">
+<li><p>Plak synthetische en geobserveerde data onder elkaar</p></li>
+<li><p>Voorspel voor elke observatie de kans <span class="math inline">\(\pi_i\)</span> dat deze synthetisch is</p></li>
+<li><p>Calculate <span class="math inline">\(pMSE\)</span> as <span class="math inline">\(\sum^N_{i=1} (\pi_i - c)^2/N\)</span>, met <span class="math inline">\(c = n_{\text{syn}} / (n_{\text{syn}} + n_{\text{obs}})\)</span></p></li>
+<li><p>Vergelijk <span class="math inline">\(pMSE\)</span> met verwachte waarde onder identieke distributies</p></li>
+</ol>
+<p>Kleine <span class="math inline">\(pMSE\)</span> waardes: synthetische data lijkt op echte data.</p>
+<p>Nadeel: Welk voorspelmodel? Hoog-dimensionele data?</p>
+</section>
+<section id="bestaande-kwaliteitsmaten-kullback-leibler-divergence" class="slide level2">
+<h2>Bestaande kwaliteitsmaten: Kullback-Leibler divergence</h2>
+<p><br></p>
+<p><span class="math display">\[KL(\boldsymbol{X}_{\text{syn}}, \boldsymbol{X}_{\text{obs}}) = \int \log\Bigg(\frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})}\Bigg) p(\boldsymbol{X}_\text{syn})\]</span></p>
+<p><br></p>
+<p>Elegante methode</p>
+<p>Praktisch moeilijk te schatten</p>
+</section>
+<section id="section-5" class="slide level2">
+<h2></h2>
+<p>Als de synthetische en de geobserveerde data gelijke verdelingen hebben, zouden ze vergelijkbare resultaten moeten geven</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="een-nieuw-raamwerk" class="title-slide slide level1 center">
+<h1>Een nieuw raamwerk</h1>
+<p>Density ratios<sup>1</sup> als kwaliteitsmaat</p>
+<p><br></p>
+<p><span class="math display">\[r(x) = \frac{p(\boldsymbol{X}_{\text{syn }})}{p(\boldsymbol{X}_{obs})}\]</span> <br> <br></p>
+<aside><ol class="aside-footnotes"><li id="fn1"><p>Zie <em>Masashi, Suzuki &amp; Kanamori (2012). Density ratio estimation in machine learning.</em></p></li></ol></aside></section>
+<section id="density-ratios" class="slide level2">
+<h2>Density ratios</h2>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<section id="density-ratios-in-de-praktijk" class="slide level2 smaller">
+<h2>Density ratios in de praktijk</h2>
+<ol type="1">
+<li>Schat de density ratio met een non-parametrische methode</li>
+</ol>
+<ul>
+<li>Unconstrained least-squares importance fitting: <span class="math inline">\(r(\boldsymbol{X}) = \boldsymbol{\psi(X)}\theta\)</span>.</li>
+</ul>
+<ol start="2" type="1">
+<li>Bereken een discrepantie maat voor de synthetische data</li>
+</ol>
+<ul>
+<li>Pearson divergence: <span class="math display">\[\hat{\text{PE}}(\boldsymbol{X}_{\text{syn}}, \boldsymbol{X}_{\text{obs}}) = \frac{1}{2n_{\text{syn}}} \sum^{n_{\text{syn}}}_{i=1} r(X^{(i)}_{\text{syn}}) - \frac{1}{n_{\text{obs}}} \sum^{n_{\text{obs}}}_{j=1} r(X^{(j)}_{\text{obs}}) + \frac{1}{2}\]</span></li>
+</ul>
+<ol start="3" type="1">
+<li><p>Vergelijk de Pearson divergence voor verschillende data sets</p></li>
+<li><p>Optioneel: Toets de nulhypothese <span class="math inline">\(p(\boldsymbol{X}_{\text{syn}}) = p(\boldsymbol{X}_{\text{obs}})\)</span> d.m.v. een permutatietest.</p></li>
+</ol>
+</section>
+<section id="density-ratios-voor-synthetische-data-univariaat" class="slide level2">
+<h2>Density ratios voor synthetische data (univariaat)</h2>
+
+<img data-src="files/densities.png" class="r-stretch"></section>
+<section id="density-ratios-voor-synthetische-data-univariaat-1" class="slide level2">
+<h2>Density ratios voor synthetische data (univariaat)</h2>
+
+<img data-src="files/density-ratios.png" class="r-stretch"></section>
+<section id="density-ratios-voor-synthetische-data-univariaat-2" class="slide level2">
+<h2>Density ratios voor synthetische data (univariaat)</h2>
+<p>Power en type I error rate</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Data</th>
+<th style="text-align: right;">Density ratio</th>
+<th style="text-align: right;">Kolmogorov-Smirnov</th>
+<th style="text-align: right;">pMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Laplace</td>
+<td style="text-align: right;">0.620</td>
+<td style="text-align: right;">0.375</td>
+<td style="text-align: right;">0.610</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-normal</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lst</td>
+<td style="text-align: right;">0.495</td>
+<td style="text-align: right;">0.235</td>
+<td style="text-align: right;">0.495</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Normal</td>
+<td style="text-align: right;">0.050</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.040</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="density-ratios-voor-synthetische-data-multivariaat" class="slide level2 smaller">
+<h2>Density ratios voor synthetische data (multivariaat)</h2>
+<h3 id="u.s.-current-population-survey-n-5000">U.S. Current Population Survey (n = 5000)<sup>1</sup></h3>
+<ul>
+<li>Vier continue variabelen (<em>age, income, social security payments, household income</em>)</li>
+<li>Vier categorische variabelen (<em>sex, race, marital status, educational attainment</em>)</li>
+</ul>
+<h3 id="synthesische-modellen">Synthesische modellen</h3>
+<p>(Multinomiale) logistische regressie voor categorische variabelen</p>
+<ol type="1">
+<li>Lineaire regressie</li>
+<li>Lineaire regressie met transformaties (derdemachtswortel)</li>
+<li>Lineaire regressie met transformaties en semi-continu modelleren</li>
+</ol>
+<aside><ol class="aside-footnotes"><li id="fn2"><p>Dank aan Jörg Drechsler voor het beschikbaar stellen van de data.</p></li></ol></aside></section>
+<section id="synthetische-data-visueel" class="slide level2">
+<h2>Synthetische data (visueel)</h2>
+
+<img data-src="files/syn-vars.png" class="r-stretch"></section>
+<section id="kwaliteit-van-synthetische-data" class="slide level2">
+<h2>Kwaliteit van synthetische data</h2>
+
+<img data-src="files/syn-PEs.png" class="r-stretch"></section>
+<section id="nadelen-van-density-ratios" class="slide level2">
+<h2>Nadelen van density ratios</h2>
+<p>Geschiktheid voor categorische data moet onderzocht worden</p>
+<ul>
+<li>In bovenstaand voorbeeld werd categorische data simpelweg getransformeerd naar numerieke data (vier categoriën –&gt; 1, 2, 3, 4)</li>
+</ul>
+<p>Privacy risico’s van density ratio waardes?</p>
+</section></section>
+<section>
+<section id="bijkomende-voordelen-van-density-ratios" class="title-slide slide level1 center">
+<h1>Bijkomende voordelen van density ratios</h1>
+
+</section>
+<section id="kwaliteit-van-synthetische-data-punten" class="slide level2">
+<h2>Kwaliteit van synthetische data punten</h2>
+<p>Voor iedere synthetische observatie wordt een density ratio waarde geschat</p>
+<ul>
+<li><p>Synthetische outliers detecteren / verwijderen</p></li>
+<li><p>Analyses op synthetische data herwegen</p></li>
+</ul>
+</section>
+<section id="beschikbare-extensies-voor-hoogdimensionele-data" class="slide level2">
+<h2>Beschikbare extensies voor hoogdimensionele data</h2>
+<p>Aanname: subspace waarin de synthetische data goed gemodelleerd is, en een subspace waar de synthetische data niet goed gemodelleerd is</p>
+<p>Doel: subspace herkennen waar de synthetische data niet goed gemodelleerd is, en hierop de density ratio schatten.</p>
+</section>
+<section id="kruisvalidatie-voor-automatische-parameter-selectie" class="slide level2">
+<h2>Kruisvalidatie voor automatische parameter selectie</h2>
+<p>In alle bovengenoemde voorbeelden zijn dezelfde hyperparameters gebruikt</p>
+<p>Kruisvalidatie zorgt ervoor dat de parameters in het density ratio model zo goed mogelijk gekozen worden.</p>
+</section></section>
+<section>
+<section id="bestaande-kwaliteitsmaten-als-density-ratios" class="title-slide slide level1 center">
+<h1>Bestaande kwaliteitsmaten als density ratios</h1>
+
+</section>
+<section id="pmse" class="slide level2 smaller">
+<h2><span class="math inline">\(pMSE\)</span></h2>
+<p><span class="math display">\[\begin{aligned}
+r(\boldsymbol{X}) &amp;= \frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})} \\
+&amp;= \frac{p(\boldsymbol{X} | Y = \text{synthetic})}{p(\boldsymbol{X}| Y = \text{observed})}
+= \frac{\frac{p(Y = \text{synthetic} | \boldsymbol{X})p(\boldsymbol{X})}{p(Y = \text{synthetic})}}{\frac{p(Y = \text{observed})p(\boldsymbol{X})}{p(Y = \text{observed})}} \\
+&amp;= \frac{p(Y = \text{observed})}{p(Y = \text{synthetic})} \frac{p(Y = \text{synthetic} | \boldsymbol{X})}{p(Y = \text{observed} | \boldsymbol{X})}
+\end{aligned}\]</span></p>
+</section>
+<section id="kullback-leibler-divergence" class="slide level2 smaller">
+<h2>Kullback-Leibler divergence</h2>
+<p><span class="math display">\[\begin{aligned}
+KL(\boldsymbol{X}_{\text{syn}}, X_{\text{obs}}) = \int \log\Bigg(\frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})}\Bigg) p(\boldsymbol{X}_\text{syn})
+\end{aligned}\]</span></p>
+<p>Note that <span class="math display">\[
+\int \log\Bigg(\frac{p(\boldsymbol{X}_{\text{syn}})}{p(\boldsymbol{X}_{\text{obs}})}\Bigg) p(\boldsymbol{X}_\text{syn})
+\]</span> can be approximated as <span class="math display">\[
+\sum^{n_{\text{syn}}}_{i=1} \log(r(\boldsymbol{X}_\text{syn}))/n_{\text{syn}}.
+\]</span></p>
 <div class="footer footer-default">
 
 </div>
-</section>
+</section></section>
+
     </div>
   </div>
 
@@ -412,7 +876,7 @@ Thom Benjamin Volker
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',
