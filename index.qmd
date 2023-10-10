@@ -1,0 +1,9 @@
+---
+title: "Het evalueren van de kwaliteit van synthetische data: Een density ratio aanpak"
+author: "Thom Benjamin Volker"
+format: revealjs
+---
+
+
+
+
